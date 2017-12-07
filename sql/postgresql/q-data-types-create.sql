@@ -2,7 +2,7 @@
 --
 
 
-CREATE TABLE qt_data_types (
+CREATE TABLE qdt_data_types (
        -- unique reference
        label  varchar(40),
        -- one of text, list, array_list, clock, decimal, integer, boolean
@@ -33,7 +33,7 @@ CREATE TABLE qt_data_types (
        css_div varchar(120),
        -- Use in an html STYLE tag as in <style = "html_style.value">
        -- This may be used with a css tag if need be.
-       html_style varchar(120)
+       html_style varchar(120),
        -- If abbreviation of data required for display etc, use this proc
        -- to abbreviate into a text-only format
        abbrev_proc varchar(40),
@@ -46,7 +46,7 @@ CREATE TABLE qt_data_types (
        -- This value is passed as attibute value pairs within the value's 
        -- wrapper. 
        -- Value is expected to be split by & and = similar to web CGI format.
-       xml_format varchar(1000),
+       xml_format varchar(1000)
 );
 
-create index qt_data_types_label_idx on qt_data_types (label);
+create index qdt_data_types_label_idx on qdt_data_types (label);
