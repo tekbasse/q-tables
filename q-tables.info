@@ -17,6 +17,7 @@
         <maturity>0</maturity>
 
         <provides url="q-tables" version="0.1d"/>
+        <requires url="q-data-types" version="1"/>
 
         <callbacks>
         </callbacks>
