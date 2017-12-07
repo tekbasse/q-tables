@@ -27,6 +27,10 @@ CREATE TABLE qt_data_types (
        qdt_label    varchar(40),
        -- data like, and overrides qdt_data_types.form_tag_attrs
        form_tag_attrs varchar(1000),
+       -- ref that points to qt_field_values. f_vc1k, f_nbr or f_txt
+       -- one of vc1k ,nbr or default to txt
+       -- This can be overridden per qt_field_defs.field_type
+       default_field_type varchar(5),
        empty_allowed_p boolean
 );
 
@@ -72,6 +76,8 @@ CREATE TABLE qt_field_defs (
      tdt_data_type varchar(40),
      -- ref that points to qt_field_values. f_vc1k, f_nbr or f_txt
      -- one of vc1k ,nbr or default to txt
+     -- This is added here as an override to 
+     -- qt_data_types.default_field_type
      field_type  varchar(5)
 );
 
