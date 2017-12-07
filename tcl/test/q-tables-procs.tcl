@@ -4,7 +4,9 @@ ad_library {
 }
 
 aa_register_case -cats {api smoke} qt_check {
-    Test api for tips procs ie qt_*
+    Test api for tips procs ie qt_*. 
+    Uses external proc qal_namlur which requires packages:
+    accounts-ledger and accounts-finance and their dependents.
 } {
     aa_run_with_teardown \
         -test_code {
