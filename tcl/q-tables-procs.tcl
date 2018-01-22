@@ -1784,14 +1784,23 @@ ad_proc -public qt_tdt_data_types {
 
 ad_proc -public qt_tdt_data_types_to_qdt {
     array_name
+    {qdt_array_name ""}
 } {
     Passes array in style of <code>::qdt::data_types -array_name array_name</code> yet modified by any qt_dtd_data_types.
+    If qdt_array_name is used in place of ::qdt::data_types, if provided.
     Returns number of tdt_data_types processed.
     <br><br>
     @see ::qdt::data_types
 } {
     upvar 1 instance_id instance_id
     upvar 1 $array_name d_arr
+    if { $qdt_array_name ne "" } {
+        upvar 1 $qdt_array_name qdt_arr
+    } else {
+        ::qdt::data_types -array_name qdt_arr
+    }
 
+    set tdt_lists [qt_tdt_data_types]
+    ##code    
     return 1
 }
