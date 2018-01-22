@@ -17,7 +17,7 @@ SELECT nextval ('qt_id_seq');
 -- as a defacto name to use. To avoid trademark issues, using the more
 -- generic q-tables instead.
 
--- This provides a way to override qt_data_types defaults locally.
+-- This provides a way to override qdt_data_types defaults locally.
 CREATE TABLE qt_data_types (
        instance_id integer,
        -- Can be same as qt_data_types.label, if overrides an instance.

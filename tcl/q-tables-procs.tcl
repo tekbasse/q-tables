@@ -79,6 +79,9 @@ ad_proc -private qt_field_defs_maps_set {
     {filter_by_label_list ""}
 } {
     Returns count of fields returned.
+    <br><br>
+    Each array index contains an ordered list of values: <code>field_id label name def_val tdt_type field_type</code>
+    <br><br>
     If filter_by_label_list is nonempty, scopes to return info on only field definitions in filter_by_label_list.
     <br><br>
     If field_type_of_label_array_name is nonempty, returns an array in calling environment
@@ -1740,4 +1743,55 @@ ad_proc -public qt_cell_trash {
             and field_id=:field_id }
     }
     return $exists_p
+}
+
+ad_proc -public qt_tdt_data_types {
+    {tdt_data_types_list ""}
+} {
+    Returns tdt_data_types as a list of ordered lists.
+    All tdt_data_types are returned if tdt_data_types_list is not supplied.
+    A list is returned instead of a list of lists, if data_types_list has only 1 tdt_data_type.
+} {
+    upvar 1 instance_id instance_id
+    set tdt_lists [list ]
+    set ref_len [llength $tdt_data_types_list]
+    if { $ref_len eq 0 } {
+        set tdt_lists [db_list_of_lists qt_data_types_r_all {
+            select type_name,
+            qdt_label,
+            form_tag_attrs,
+            default_field_type,
+            empty_allowed_p
+            where instance_id=:instance_id }]
+    } else {
+        set tdt_lists [db_list_of_lists qt_data_types_r_all "select \
+            type_name, \
+            qdt_label, \
+            form_tag_attrs, \
+            default_field_type, \
+            empty_allowed_p \
+            where instance_id=:instance_id \
+            and type_name in [template::util::tcl_to_sql_list ${tdt_data_types_list} ]" ]
+    }
+    if { $ref_len eq 1 } {
+        if { [llength $tdt_lists] > 1 } {
+            ns_log Warning "qt_tdt_data_types. Multiple rows returned for '${tdt_data_types_list}' instance_id '${instance_id}'. First used. May result in erratic issues."
+        }
+        set tdt_lists [lindex $tdt_lists 0]
+    }
+    return $tdt_lists
+}
+
+ad_proc -public qt_tdt_data_types_to_qdt {
+    array_name
+} {
+    Passes array in style of <code>::qdt::data_types -array_name array_name</code> yet modified by any qt_dtd_data_types.
+    Returns number of tdt_data_types processed.
+    <br><br>
+    @see ::qdt::data_types
+} {
+    upvar 1 instance_id instance_id
+    upvar 1 $array_name d_arr
+
+    return 1
 }
