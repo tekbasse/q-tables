@@ -1786,21 +1786,56 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     array_name
     {qdt_array_name ""}
 } {
-    Passes array in style of <code>::qdt::data_types -array_name array_name</code> yet modified by any qt_dtd_data_types.
-    If qdt_array_name is used in place of ::qdt::data_types, if provided.
+    Passes array <code>array_name</code> in style of 
+    <code>::qdt::data_types -array_name array_name</code> 
+##code verify array has same indexing format.
+    yet modified by any qt_dtd_data_types.
+    <code>qdt_array_name</code> is used in place of ::qdt::data_types, if provided.
+    If <code>array_name</code> and <code>qdt_array_name</code> are the same,
+    values in <code>qdt_array_name</code> are changed, 
+    the same as <code>array_name</code>.
     Returns number of tdt_data_types processed.
+
     <br><br>
     @see ::qdt::data_types
 } {
     upvar 1 instance_id instance_id
     upvar 1 $array_name d_arr
+    # Must handle case where array_name == qdt_array_name
     if { $qdt_array_name ne "" } {
-        upvar 1 $qdt_array_name qdt_arr
+        if { $qdt_array_name ne $array_name } {
+            upvar 1 $qdt_array_name qdt_arr
+            array set d_arr [array get qdt_arr]
+        } else {
+            # d_arr is already qdt_arr
+            # do nothing
+        }
     } else {
-        ::qdt::data_types -array_name qdt_arr
+        ::qdt::data_types -array_name d_arr
     }
 
     set tdt_lists [qt_tdt_data_types]
-    ##code    
-    return 1
+    set count 0
+    set qdt_overrides_list [list ]
+    set qdt_names_list [array names $d_arr]
+    foreach tdt_ol $tdt_lists {
+        # type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
+        set qdt_name [lindex $tdt_ol 1]
+        set attrs_list [lindex $tdt_ol 2]
+        set d_arr(${qdt_name}) $attrs_list
+        if { $qdt_name in $qdt_names_list } {
+            lappend qdt_overrides_list $qdt_name
+        }
+    }
+    if { [llength $qdt_overrides_list] > 0 } {
+        if { [ns_conn isconnected] } {
+            ns_log Notice "qt_tdt_data_types_to_qdt: \
+ overriding qdt::data_types '${qdt_overrides_list}' for url '[ad_conn url]'"
+        } else {
+            ns_log Notice "qt_tdt_data_types_to_qdt: \
+ overriding qdt::data_types '${qdt_overrides_list}' \
+ for instance_id '${instance_id}' array_name '${array_name}'"
+        }
+    }
+    return $count
 }

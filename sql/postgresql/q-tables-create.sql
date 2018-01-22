@@ -25,7 +25,8 @@ CREATE TABLE qt_data_types (
        -- Can map type_name to a different label..
        -- external key qdt_data_types.label
        qdt_label    varchar(40),
-       -- data like, and overrides qdt_data_types.form_tag_attrs
+       -- data like and overrides all 
+       -- qdt_data_types.form_tag_attrs of qt_data_types.qdt_label
        form_tag_attrs varchar(1000),
        -- ref that points to qt_field_values. f_vc1k, f_nbr or f_txt
        -- one of vc1k ,nbr or default to txt
