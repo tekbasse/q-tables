@@ -1786,22 +1786,30 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     array_name
     {qdt_array_name ""}
 } {
-    Passes array <code>array_name</code> in style of 
-    <code>::qdt::data_types -array_name array_name</code> 
-##code verify array has same indexing format.
+    Passes array <code>array_name</code> in style of output from
+    <code>::qdt::data_types -array_name array_name</code>, 
     yet modified by any qt_dtd_data_types.
+    <br><br>
     <code>qdt_array_name</code> is used in place of ::qdt::data_types, if provided.
+    <br><br>
+    Basically, this adds or re-maps existing qdt_array indexes using
+    information supplied by tdt_data_types.
+    This is important for compatibility,
+    when applying tdt_data_types in context with
+    default fields and qdt::data_types that defined outside of q-tables.
+    <br><br>
     If <code>array_name</code> and <code>qdt_array_name</code> are the same,
     values in <code>qdt_array_name</code> are changed, 
     the same as <code>array_name</code>.
+    <br><br>
     Returns number of tdt_data_types processed.
-
     <br><br>
     @see ::qdt::data_types
 } {
+    ##code verify array has same indexing format.
     upvar 1 instance_id instance_id
     upvar 1 $array_name d_arr
-    # Must handle case where array_name == qdt_array_name
+    # Handle case where array_name == qdt_array_name
     if { $qdt_array_name ne "" } {
         if { $qdt_array_name ne $array_name } {
             upvar 1 $qdt_array_name qdt_arr
