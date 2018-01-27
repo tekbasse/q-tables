@@ -1807,10 +1807,10 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     <br><br>
     @see qdt::data_types
 } {
-    ##code verify array has same indexing format.
+    ##code verify coding expects array has same indexing format as ::qdt::data_types
     upvar 1 instance_id instance_id
     upvar 1 $array_name d_arr
-    # Handle case where array_name == qdt_array_name
+    # Handle case where array_name equals qdt_array_name
     if { $qdt_array_name ne "" } {
         if { $qdt_array_name ne $array_name } {
             upvar 1 $qdt_array_name qdt_arr
@@ -1829,6 +1829,14 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     set qdt_names_list [array names $d_arr]
     foreach tdt_ol $tdt_lists {
         # type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
+
+        # Mesh tdt data on qdt:data_types
+        # If type_name is a new datatype, 
+        #    Make a copy of qdt_label into new datatype type_name
+        #    Replace value of qdt.form_tag_arrs with tdt_form_tag_attrs
+        #    Replace value of empty_allowed_p
+        # If type_name is a qdt_label, 
+        #    replace datatype with one built same as as if new
         set qdt_name [lindex $tdt_ol 1]
         set attrs_list [lindex $tdt_ol 2]
         set d_arr(${qdt_name}) $attrs_list
