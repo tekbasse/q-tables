@@ -1788,7 +1788,8 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 } {
     Passes array <code>array_name</code> in style of output from
     <code>::qdt::data_types -array_name array_name</code>, 
-    yet modified by any qt_dtd_data_types.
+    where array_name is expected in format provied by
+    <code>qt_dtd_data_types</code>.
     <br><br>
     <code>qdt_array_name</code> is used in place of ::qdt::data_types, if provided.
     <br><br>
@@ -1804,7 +1805,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     <br><br>
     Returns number of tdt_data_types processed.
     <br><br>
-    @see ::qdt::data_types
+    @see qdt::data_types
 } {
     ##code verify array has same indexing format.
     upvar 1 instance_id instance_id
