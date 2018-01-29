@@ -1793,7 +1793,9 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     <br><br>
     <code>qdt_array_name</code> is used in place of ::qdt::data_types, if provided.
     <br><br>
-    Basically, this adds or re-maps existing qdt_array indexes using
+    Only array_name is modified by this proc.
+    <br><br>
+    The purpose is to add or re-map existing qdt_array indexes using
     information supplied by tdt_data_types.
     This is important for compatibility,
     when applying tdt_data_types in context with
@@ -1822,26 +1824,60 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     } else {
         ::qdt::data_types -array_name d_arr
     }
+    # d_arr is an ordered list:
+    # 0 label
+    #   tcl_type
+    #   max_length
+    #   form_tag_type
+    # 4 form_tag_attrs
+    # 5 empty_allowed_p
+    #   input_hint
+    #   text_format_proc
+    #   tcl_format_str
+    #   tcl_clock_format_str
+    #   valida_proc
+    #   filter_proc
+    #   default_proc
+    #   css_span
+    #   css_div
+    #   html_style
+    #   abbrev_proc
+    #   css_abbrev
+    #   xml_format
+
 
     set tdt_lists [qt_tdt_data_types]
-    set count 0
-    set qdt_overrides_list [list ]
-    set qdt_names_list [array names $d_arr]
-    foreach tdt_ol $tdt_lists {
-        # type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
 
-        # Mesh tdt data on qdt:data_types
-        # If type_name is a new datatype, 
-        #    Make a copy of qdt_label into new datatype type_name
-        #    Replace value of qdt.form_tag_arrs with tdt_form_tag_attrs
-        #    Replace value of empty_allowed_p
-        # If type_name is a qdt_label, 
-        #    replace datatype with one built same as as if new
-        set qdt_name [lindex $tdt_ol 1]
-        set attrs_list [lindex $tdt_ol 2]
-        set d_arr(${qdt_name}) $attrs_list
-        if { $qdt_name in $qdt_names_list } {
+    set count 0
+    set qdt_names_list [array names $d_arr]
+    set qdt_overrides_list [list]
+    foreach tdt_ol $tdt_lists {
+    # Mesh tdt_ol data on qdt:data_types' array ie d_arr
+        lassign $tdt_ol type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
+        # type_name is new datatype based on datatype with name/label qdt_label
+        ##code  Write 
+        set tdt_new_ol [list ]
+        if { $qdt_label in $qdt_names_list } {
+            # Make a copy of qdt_label into new datatype type_name
+            set tdt_new_ol $d_arr(${qdt_label})
             lappend qdt_overrides_list $qdt_name
+        } else {
+            if { $type_name ni $qdt_names_list } {
+                ns_log Warning "qt_tdt_data_types_to_qdt.1860: \
+ qdt_label '${qdt_label}' and type_name '${type_name}' not found. Ignored."
+            } else {
+                # Treat type_name as qdt datatype to modify
+                set tdt_new_ol $d_arr(${type_name})
+                lappend qdt_overrides_list $type_name
+            }
+        }
+        if { [llength $tdt_new_ol] > 1 } {
+
+            # overlay form_tag_attrs
+            #   qdt.form_tag_arrs replaced with tdt_form_tag_attrs
+            #   Replace value of empty_allowed_p
+            set tdt_new_ol [lreplace $tdt_new_ol 4 5 $form_tag_attrs $empty_allowed_p]
+            set d_arr(${type_name}) $tdt_new_ol
         }
     }
     if { [llength $qdt_overrides_list] > 0 } {
