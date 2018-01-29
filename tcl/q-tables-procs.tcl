@@ -1750,7 +1750,6 @@ ad_proc -public qt_tdt_data_types {
 } {
     Returns tdt_data_types as a list of ordered lists.
     All tdt_data_types are returned if tdt_data_types_list is not supplied.
-    A list is returned instead of a list of lists, if data_types_list has only 1 tdt_data_type.
 } {
     upvar 1 instance_id instance_id
     set tdt_lists [list ]
@@ -1762,6 +1761,7 @@ ad_proc -public qt_tdt_data_types {
             form_tag_attrs,
             default_field_type,
             empty_allowed_p
+            from qdt_data_types
             where instance_id=:instance_id }]
     } else {
         set tdt_lists [db_list_of_lists qt_data_types_r_all "select \
@@ -1770,14 +1770,9 @@ ad_proc -public qt_tdt_data_types {
             form_tag_attrs, \
             default_field_type, \
             empty_allowed_p \
+            from qt_data_types \
             where instance_id=:instance_id \
             and type_name in [template::util::tcl_to_sql_list ${tdt_data_types_list} ]" ]
-    }
-    if { $ref_len eq 1 } {
-        if { [llength $tdt_lists] > 1 } {
-            ns_log Warning "qt_tdt_data_types. Multiple rows returned for '${tdt_data_types_list}' instance_id '${instance_id}'. First used. May result in erratic issues."
-        }
-        set tdt_lists [lindex $tdt_lists 0]
     }
     return $tdt_lists
 }
@@ -1809,7 +1804,6 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     <br><br>
     @see qdt::data_types
 } {
-    ##code verify coding expects array has same indexing format as ::qdt::data_types
     upvar 1 instance_id instance_id
     upvar 1 $array_name d_arr
     # Handle case where array_name equals qdt_array_name
@@ -1857,7 +1851,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     # Mesh tdt_ol data on qdt:data_types' array ie d_arr
         lassign $tdt_ol type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
         # type_name is new datatype based on datatype with name/label qdt_label
-        ##code  Write 
+
         set tdt_new_ol [list ]
         if { $qdt_label in $qdt_names_list } {
             # Make a copy of qdt_label into new datatype type_name

@@ -816,8 +816,12 @@ BEGIN TEST LOOP for value '${v}'"
                                 incr t1_c
                             }
                         }
+                        aa_log "test.F qt_tdt_data_types"
 
-                           
+                        ##code
+
+                        aa_log "test.F qt_tdt_data_types_to_qdt"
+                        ##code
                         
                         ns_log Notice "tcl/test/q-control-procs.tcl.429 test end"
                     } \
