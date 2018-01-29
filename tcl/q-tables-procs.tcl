@@ -1850,7 +1850,9 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 
     set count 0
     set qdt_names_list [array names $d_arr]
-    set qdt_overrides_list [list]
+    set qdt_overrides_list [list ]
+    set tdt_ol_retry_lists [list ]
+    set changes_lists [list ]
     foreach tdt_ol $tdt_lists {
     # Mesh tdt_ol data on qdt:data_types' array ie d_arr
         lassign $tdt_ol type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
@@ -1862,11 +1864,9 @@ ad_proc -public qt_tdt_data_types_to_qdt {
             set tdt_new_ol $d_arr(${qdt_label})
             lappend qdt_overrides_list $qdt_name
         } else {
-            if { $type_name ni $qdt_names_list } {
-                ns_log Warning "qt_tdt_data_types_to_qdt.1860: \
- qdt_label '${qdt_label}' and type_name '${type_name}' not found. Ignored."
-            } else {
+            if { $type_name in $qdt_names_list } {
                 # Treat type_name as qdt datatype to modify
+                #
                 set tdt_new_ol $d_arr(${type_name})
                 lappend qdt_overrides_list $type_name
             }
@@ -1877,15 +1877,88 @@ ad_proc -public qt_tdt_data_types_to_qdt {
             #   qdt.form_tag_arrs replaced with tdt_form_tag_attrs
             #   Replace value of empty_allowed_p
             set tdt_new_ol [lreplace $tdt_new_ol 4 5 $form_tag_attrs $empty_allowed_p]
-            set d_arr(${type_name}) $tdt_new_ol
+            # Delay until all dependencies reference same originals
+            #set d_arr(${type_name}) $tdt_new_ol
+            set d_list [list $type_name $tdt_new_ol]
+            lappend changes_lists $d_lists
+        } else {
+            lappend tdt_ol_retry_lists $tdt_ol
+        }
+
+    }
+
+    # Apply changes.
+    foreach {type_name tdt_new_ol} $changes_lists {
+        set d_arr(${type_name}) $tdt_new_ol
+    }
+
+    # Retry working through tdt_new_ol cases that did not meet dependencies.
+    set i 0
+    set tdt_ol_retry_lists_len [llength $tdt_ol_retry_lists_len]
+    if { $tdt_ol_retry_lists_len > 0 } {
+
+        set i_max $tdt_ol_retry_lists_len + 1
+        set tdt_ol_retry_lists_len_prev [expr { $tdt_ol_retry_lists_len + 1 } ]
+        while { $i < $i_max \
+                    && $tdt_ol_retry_lists_len < $tdt_ol_retry_lists_len_prev } {
+            set new_retry_lists [list ]
+            foreach tdt_ol $tdt_ol_retry_lists {
+                # Mesh tdt_ol data on qdt:data_types' array ie d_arr
+                lassign $tdt_ol \
+                    type_name \
+                    qdt_label \
+                    form_tag_attrs \
+                    default_field_type \
+                    empty_allowed_p
+                # type_name is new datatype based on datatype with qdt_label
+                set tdt_new_ol [list ]
+                if { $qdt_label in $qdt_names_list } {
+                    # Make a copy of qdt_label into new datatype type_name
+                    set tdt_new_ol $d_arr(${qdt_label})
+                    lappend qdt_overrides_list $qdt_name
+                } else {
+                    if { $type_name in $qdt_names_list } {
+                        # Treat type_name as qdt datatype to modify
+                        #
+                        set tdt_new_ol $d_arr(${type_name})
+                        lappend qdt_overrides_list $type_name
+                    }
+                }
+                if { [llength $tdt_new_ol] > 1 } {
+
+                    # overlay form_tag_attrs
+                    #   qdt.form_tag_arrs replaced with tdt_form_tag_attrs
+                    #   Replace value of empty_allowed_p
+                    set tdt_new_ol [lreplace $tdt_new_ol 4 5 $form_tag_attrs $empty_allowed_p]
+                    set d_arr(${type_name}) $tdt_new_ol
+                    # remove type_name from 
+                } else {
+                    lappend new_retry_lists $tdt_ol
+                }
+
+            }
+
+            set tdt_ol_retry_lists_len_prev $tdt_ol_retry_lists_len
+            set tdt_ol_retry_lists $new_retry_lists
+            set tdt_ol_retry_lists_len [llength $tdt_ol_retry_lists]
+        }
+        if { [llength $new_retry_lists] > 0 } {
+            foreach tdt_ol $new_retry_lists {
+                set type_name [lindex $tdt_ol 0]
+                set qdt_label [lindex $tdt_ol 1]
+                ns_log Warning "qt_tdt_data_types_to_qdt.1860: \
+ qdt_label '${qdt_label}' and type_name '${type_name}' not found. Ignored."
+            }
         }
     }
+
+
     if { [llength $qdt_overrides_list] > 0 } {
         if { [ns_conn isconnected] } {
-            ns_log Notice "qt_tdt_data_types_to_qdt: \
+            ns_log Notice "qt_tdt_data_types_to_qdt.1894: \
  overriding qdt::data_types '${qdt_overrides_list}' for url '[ad_conn url]'"
         } else {
-            ns_log Notice "qt_tdt_data_types_to_qdt: \
+            ns_log Notice "qt_tdt_data_types_to_qdt.1897: \
  overriding qdt::data_types '${qdt_overrides_list}' \
  for instance_id '${instance_id}' array_name '${array_name}'"
         }
