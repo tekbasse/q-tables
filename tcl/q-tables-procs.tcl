@@ -837,7 +837,7 @@ ad_proc -public qt_field_def_create {
     <p>
     Searches are fastest on vc1k types as these entries are indexed in the data model.
     <br>
-    <code>tdt_data_type</code> references an entry in qt_data_types.
+    <code>tdt_data_type</code> references an entry in qt_data_types table.
     <br>
     @return field_def_id or empty string if unsuccessful.
 } {
@@ -1761,10 +1761,10 @@ ad_proc -public qt_tdt_data_types {
             form_tag_attrs,
             default_field_type,
             empty_allowed_p
-            from qdt_data_types
+            from qt_data_types
             where instance_id=:instance_id }]
     } else {
-        set tdt_lists [db_list_of_lists qt_data_types_r_all "select \
+        set tdt_lists [db_list_of_lists qt_data_types_r_n "select \
             type_name, \
             qdt_label, \
             form_tag_attrs, \
