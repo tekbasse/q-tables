@@ -817,8 +817,16 @@ BEGIN TEST LOOP for value '${v}'"
                             }
                         }
                         aa_log "test.F qt_tdt_data_types"
+                        ##code  Manually add some rows
+                        qt_dtd_data_type_add [list ....]
 
-                        ##code
+                        set tdt_all_lists [qt_tdt_data_types]
+                        set tdt_0len [llength [lindex $tdt_all_lists 0]]
+                        foreach tdt_list $tdt_all_lists {
+                            set tdt_len [llength $tdt_list]
+                            aa_equal "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
+                        }
+
 
                         aa_log "test.F qt_tdt_data_types_to_qdt"
                         ##code

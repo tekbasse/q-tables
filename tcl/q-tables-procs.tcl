@@ -1777,6 +1777,62 @@ ad_proc -public qt_tdt_data_types {
     return $tdt_lists
 }
 
+ad_proc -public qt_tdt_data_type_add {
+    name_value_list
+} {
+    Adds an entry to qt_data_types table.
+    These names are expected: type_name qdt_label form_tag_attrs default_field_type empty_allowed_p instance_id
+    Any other names are ignored.
+    For meaning of each, see qt_data_types table definition.
+    Returns 1 if successful. Otherwishe returns 0.
+} {
+    upvar 1 instance_id instance_id
+    set success_p 0
+    set names_list [list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p]
+
+    foreach name $name_value_list {
+        set $name ""
+    }
+    # Don't overwrite instance_id
+    if { ![info exists instance_id] } {
+        set instance_id [ad_conn package_id]
+    }
+    lappend names_list instance_id
+
+    foreach {name value} $name_value_list {
+        if { $name in $names_list } {
+            set name $value
+        }
+    }
+    if { $type_name ne "" } {
+        set type_name_exists_p [db_0or1row qt_data_type_exists_q {
+            select type_name from qt_data_types
+            where type_name=:type_name 
+            and instance_id=:instance_id} ]
+        
+        if { $type_name_exists_p } {
+            db_dml qt_tdt_data_type_u1 {
+                update qt_data_types 
+                set qdt_label=:qdt_label,
+                form_tag_attrs=:form_tag_attrs,
+                default_field_type=:default_field_type,
+                empty_allowed_p=:empty_allowed_p
+                where instance_id=:instance_id
+                and type_name=:type_name }
+
+        } else {
+            db_dml qt_tdt_data_type_w1 {
+                insert into qt_data_types 
+                (type_name,qdt_label,form_tag_attrs,default_field_type,empty_allowed_p)
+                values (:type_name,:qdt_label,:form_tag_attrs,:default_field_type,:empty_allowed_p)
+            }
+        }
+    } else {
+        set success_p 0
+    }
+    return $success_p
+}
+
 ad_proc -public qt_tdt_data_types_to_qdt {
     array_name
     {qdt_array_name ""}
