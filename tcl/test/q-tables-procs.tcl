@@ -816,8 +816,19 @@ BEGIN TEST LOOP for value '${v}'"
                                 incr t1_c
                             }
                         }
+                        #  qdt::datatypes tested in q-datatypes package
+                        ::qdt::data_types -array_name t_arr
+                        set qdt_datatypes_list [array names t_arr "*,label"]
+                        foreach {n v} $qdt_datatypes_list {
+                            lappend qdt_labels_ul [string range $n \
+                                                       [string first "," $n]+1 end]
+                        }
+
                         aa_log "test.F qt_tdt_data_types"
                         ##code  Manually add some rows
+                        set type_name [ad_generate_random_string [random range 39]]
+                        set qdt_label [util::random_list_element $qdt_labels_ul]
+
                         qt_dtd_data_type_add [list ....]
 
                         set tdt_all_lists [qt_tdt_data_types]
