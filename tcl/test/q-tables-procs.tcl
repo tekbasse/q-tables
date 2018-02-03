@@ -826,16 +826,48 @@ BEGIN TEST LOOP for value '${v}'"
 
                         aa_log "test.F qt_tdt_data_types"
                         ##code  Manually add some rows
-                        set type_name [ad_generate_random_string [random range 39]]
-                        set qdt_label [util::random_list_element $qdt_labels_ul]
+                        set tdt_names_list [list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p]
+                        set tdt_all_lists [qt_dtd_data_types]
+                        set tdt_all_len [llength $tdt_all_lists]
+                        aa_equal "test.F1 no qt_tdt_data_types" $tdt_all_len 0
 
-                        qt_dtd_data_type_add [list ....]
+                        set i_max [randomRange 6]
+                        for {set i 0} {$i < $i_max} {incr i} {
+
+                            # type_names_ol is an ordered list
+                            # because we use index to create a range of
+                            # test values later.
+                            lappend type_names_ol [ad_generate_random_string [random range 39]]
+                        }
+                        set default_field_type_list [util::randomize_list [list vc1k nbr txt]]
+                        
+                        set i 0
+                        foreach type_name $type_names_ol {
+                            set i_mod3 [expr { $i % 3 } ]
+                            set i_mod2 [expr { $i % 2 } ]
+                            set qdt_label [util::random_list_element $qdt_labels_ul]
+                            set form_tag_attrs [list name test value test]
+                            set default_field_type [lindex $default_field_type_list $i_mod3]
+                            set empty_allowed_p $i_mod2
+                            set tdt_list [list ]
+                            foreach n $tdt_names_list {
+                                lappend tdt_list n $n
+                                set tdt_arr(${type_name},${n}) $n
+                            }
+
+                            qt_dtd_data_type_add $tdt_list
+                            incr i
+                        }
 
                         set tdt_all_lists [qt_tdt_data_types]
                         set tdt_0len [llength [lindex $tdt_all_lists 0]]
                         foreach tdt_list $tdt_all_lists {
                             set tdt_len [llength $tdt_list]
                             aa_equal "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
+                            lassign $tdt_list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
+                            foreach n $tdt_names_list {
+                                aa_equal "test.F1 ${type_name} ${n}" $n $tdt_arr(${type_name},${n})
+                            }
                         }
 
 
