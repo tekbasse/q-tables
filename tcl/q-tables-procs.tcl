@@ -1784,7 +1784,7 @@ ad_proc -public qt_tdt_data_type_add {
     These names are expected: type_name qdt_label form_tag_attrs default_field_type empty_allowed_p instance_id
     Any other names are ignored.
     For meaning of each, see qt_data_types table definition.
-    Returns 1 if successful. Otherwishe returns 0.
+    Returns 1 if successful. Otherwise returns 0.
 } {
     upvar 1 instance_id instance_id
     set success_p 0
@@ -1801,7 +1801,7 @@ ad_proc -public qt_tdt_data_type_add {
 
     foreach {name value} $name_value_list {
         if { $name in $names_list } {
-            set name $value
+            set $name $value
         }
     }
     if { $type_name ne "" } {
@@ -1827,8 +1827,9 @@ ad_proc -public qt_tdt_data_type_add {
                 values (:type_name,:qdt_label,:form_tag_attrs,:default_field_type,:empty_allowed_p)
             }
         }
+        set success_p 1
     } else {
-        set success_p 0
+        ns_log Warning "qt_tdt_data_type_add.1832: type_name is empty. Ignored name_value_list '${name_value_list}'"
     }
     return $success_p
 }
@@ -1899,7 +1900,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     set tdt_lists [qt_tdt_data_types]
 
     set count 0
-    set qdt_names_list [array names $d_arr]
+    set qdt_names_list [array names d_arr]
     set qdt_overrides_list [list ]
     set tdt_ol_retry_lists [list ]
     set changes_lists [list ]
@@ -1944,7 +1945,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 
     # Retry working through tdt_new_ol cases that did not meet dependencies.
     set i 0
-    set tdt_ol_retry_lists_len [llength $tdt_ol_retry_lists_len]
+    set tdt_ol_retry_lists_len [llength $tdt_ol_retry_lists]
     if { $tdt_ol_retry_lists_len > 0 } {
 
         set i_max $tdt_ol_retry_lists_len + 1

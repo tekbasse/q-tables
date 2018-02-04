@@ -858,11 +858,12 @@ BEGIN TEST LOOP for value '${v}'"
                             set empty_allowed_p $i_mod2
                             set tdt_list [list ]
                             foreach n $tdt_names_list {
-                                lappend tdt_list n $n
-                                set tdt_arr(${type_name},${n}) $n
+                                lappend tdt_list $n [set $n]
+                                set tdt_arr(${type_name},${n}) [set $n]
                             }
 
-                            qt_dtd_data_type_add $tdt_list
+                            set wrote_p [qt_tdt_data_type_add $tdt_list]
+                            aa_true "Added tdt_list '${tdt_list}'" $wrote_p
                             incr i
                         }
 
