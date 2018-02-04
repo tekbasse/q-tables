@@ -816,15 +816,20 @@ BEGIN TEST LOOP for value '${v}'"
                                 incr t1_c
                             }
                         }
+
+                        aa_log "test.F qt_tdt_data_types"
+
+
                         #  qdt::datatypes tested in q-datatypes package
                         ::qdt::data_types -array_name t_arr
                         set qdt_datatypes_list [array names t_arr "*,label"]
-                        foreach {n v} $qdt_datatypes_list {
-                            lappend qdt_labels_ul [string range $n \
-                                                       [string first "," $n]+1 end]
-                        }
+                        set qdt_labels_ul [list ]
 
-                        aa_log "test.F qt_tdt_data_types"
+                        foreach n $qdt_datatypes_list {
+                            lappend qdt_labels_ul [string range $n \
+                                                       0 [string first "," $n]-1]
+                        }
+                        aa_log "qdt_labels_ul '${qdt_labels_ul}'"
 
                         set tdt_names_list [list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p]
                         set tdt_all_lists [qt_tdt_data_types]
@@ -839,7 +844,7 @@ BEGIN TEST LOOP for value '${v}'"
                             # type_names_ol is an ordered list
                             # because we use index to create a range of
                             # test values later.
-                            lappend type_names_ol [ad_generate_random_string [random range 39]]
+                            lappend type_names_ol [ad_generate_random_string [randomRange 39]]
                         }
                         set default_field_type_list [util::randomize_list [list vc1k nbr txt]]
                         
