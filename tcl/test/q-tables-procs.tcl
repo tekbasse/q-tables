@@ -825,13 +825,15 @@ BEGIN TEST LOOP for value '${v}'"
                         }
 
                         aa_log "test.F qt_tdt_data_types"
-                        ##code  Manually add some rows
+
                         set tdt_names_list [list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p]
-                        set tdt_all_lists [qt_dtd_data_types]
+                        set tdt_all_lists [qt_tdt_data_types]
                         set tdt_all_len [llength $tdt_all_lists]
-                        aa_equal "test.F1 no qt_tdt_data_types" $tdt_all_len 0
+                        aa_equals "test.F1 no qt_tdt_data_types" $tdt_all_len 0
 
                         set i_max [randomRange 6]
+                        incr i_max
+                        set type_names_ol [list ]
                         for {set i 0} {$i < $i_max} {incr i} {
 
                             # type_names_ol is an ordered list
@@ -863,17 +865,34 @@ BEGIN TEST LOOP for value '${v}'"
                         set tdt_0len [llength [lindex $tdt_all_lists 0]]
                         foreach tdt_list $tdt_all_lists {
                             set tdt_len [llength $tdt_list]
-                            aa_equal "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
+                            aa_equals "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
                             lassign $tdt_list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
                             foreach n $tdt_names_list {
-                                aa_equal "test.F1 ${type_name} ${n}" $n $tdt_arr(${type_name},${n})
+                                aa_equals "test.F1 ${type_name} ${n}" $n $tdt_arr(${type_name},${n})
                             }
                         }
 
 
-                        aa_log "test.F qt_tdt_data_types_to_qdt"
+                        aa_log "test.G qt_tdt_data_types_to_qdt"
+
+                        #  Before F tests:
+                        #::qdt::data_types -array_name t_arr
+                        # qdt_datatypes_list 
+                        # qdt_labels_ul 
                         ##code
-                        
+                        qt_tdt_data_types_to_qdt tdt2_arr t_arr
+                        # Check the cases where t_arr and tdt2_arr have same elements
+                        # Check cases from tdt_names_list
+                        foreach tdt_list $tdt_all_lists {
+                            set tdt_len [llength $tdt_list]
+                            aa_equals "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
+                            lassign $tdt_list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
+                            
+                            foreach n $tdt_names_list {
+                                aa_equals "test.F1 ${type_name} ${n}" $n $t_arr(${type_name},${n})
+                            }
+                        }
+
                         ns_log Notice "tcl/test/q-control-procs.tcl.429 test end"
                     } \
         -teardown_code {
