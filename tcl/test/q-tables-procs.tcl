@@ -868,6 +868,8 @@ BEGIN TEST LOOP for value '${v}'"
                         }
 
                         set tdt_all_lists [qt_tdt_data_types]
+                        aa_equals "test.F qt_tdt_data_types count " \
+                            [llength $tdt_all_lists] $i_max
                         set tdt_0len [llength [lindex $tdt_all_lists 0]]
                         foreach tdt_list $tdt_all_lists {
                             set tdt_len [llength $tdt_list]
@@ -886,16 +888,20 @@ BEGIN TEST LOOP for value '${v}'"
                         # qdt_datatypes_list 
                         # qdt_labels_ul 
                         ##code
+
+                        set tdt_all_lists [qt_tdt_data_types]
+                        set tdt_0len [llength [lindex $tdt_all_lists 0]]
+
                         qt_tdt_data_types_to_qdt tdt2_arr t_arr
                         # Check the cases where t_arr and tdt2_arr have same elements
                         # Check cases from tdt_names_list
                         foreach tdt_list $tdt_all_lists {
                             set tdt_len [llength $tdt_list]
-                            aa_equals "test.F '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
+                            aa_equals "test.G '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
                             lassign $tdt_list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
-                            
+                            # Check against tdt2_arr entry
                             foreach n $tdt_names_list {
-                                aa_equals "test.F1 ${type_name} ${n}" $n $t_arr(${type_name},${n})
+                                aa_equals "test.G1 ${type_name} ${n}" $n $td2_arr(${type_name},${n})
                             }
                         }
 

@@ -1840,7 +1840,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 } {
     Passes array <code>array_name</code> in style of output from
     <code>::qdt::data_types -array_name array_name</code>, 
-    where array_name is expected in format provied by
+    where array_name is expected in format provided by
     <code>qt_dtd_data_types</code>.
     <br><br>
     <code>qdt_array_name</code> is used in place of ::qdt::data_types, if provided.
