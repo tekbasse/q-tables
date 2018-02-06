@@ -863,7 +863,7 @@ BEGIN TEST LOOP for value '${v}'"
                             }
 
                             set wrote_p [qt_tdt_data_type_add $tdt_list]
-                            aa_true "Added tdt_list '${tdt_list}'" $wrote_p
+                            aa_true "According to qt_tdt_data_type_add, added tdt '${tdt_list}'" $wrote_p
                             incr i
                         }
 

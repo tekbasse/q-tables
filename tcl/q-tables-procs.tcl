@@ -1823,8 +1823,8 @@ ad_proc -public qt_tdt_data_type_add {
         } else {
             db_dml qt_tdt_data_type_w1 {
                 insert into qt_data_types 
-                (type_name,qdt_label,form_tag_attrs,default_field_type,empty_allowed_p)
-                values (:type_name,:qdt_label,:form_tag_attrs,:default_field_type,:empty_allowed_p)
+                (instance_id,type_name,qdt_label,form_tag_attrs,default_field_type,empty_allowed_p)
+                values (:instance_id,:type_name,:qdt_label,:form_tag_attrs,:default_field_type,:empty_allowed_p)
             }
         }
         set success_p 1
@@ -1948,7 +1948,8 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     set tdt_ol_retry_lists_len [llength $tdt_ol_retry_lists]
     if { $tdt_ol_retry_lists_len > 0 } {
 
-        set i_max $tdt_ol_retry_lists_len + 1
+        set i_max $tdt_ol_retry_lists_len
+        incr i_max
         set tdt_ol_retry_lists_len_prev [expr { $tdt_ol_retry_lists_len + 1 } ]
         while { $i < $i_max \
                     && $tdt_ol_retry_lists_len < $tdt_ol_retry_lists_len_prev } {
