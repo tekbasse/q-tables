@@ -1909,12 +1909,14 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     foreach qdt_name $qdt_names_list {
         lappend qdt_labels_list [string range $qdt_name 0 end-6]
     }
+    ns_log Notice "qt_tdt_data_types_to_qdt.1912 qdt_labels_list '${qdt_labels_list}'"
 
     set qdt_fields_sample_list [array names d_arr "${qdt_name},*"]
     set qdt_fields_list [list ]
     foreach fs $qdt_fields_sample_list {
         lappend qdt_fields_list [string range $fs [string first "," $fs]+1 end]
     }
+    ns_log Notice "qt_tdt_data_types_to_qdt.1918 qdt_fields_list '${qdt_fields_list}'"
 
     set qdt_overrides_list [list ]
     set tdt_ol_retry_lists [list ]
@@ -1924,36 +1926,29 @@ ad_proc -public qt_tdt_data_types_to_qdt {
         lassign $tdt_ol type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
         # type_name is new datatype based on datatype with name/label qdt_label
 
-        set new_entry_label ""
+        set template_label ""
         if { $qdt_label in $qdt_labels_list } {
+            set template_label $qdt_label
+        } elseif { $type_name in $qdt_labels_list } {
+            set template_label $type_name
+        }
+        if { $template_label ne "" } {
             # Make a copy of qdt_label into new datatype type_name
             foreach qf $qdt_fields_list {
-                set d_new_arr(${qdt_label},${qf}) $d_arr(${qdt_label},${qf})
+                set d_new_arr(${type_name},${qf}) $d_arr(${template_label},${qf})
             }
-            lappend qdt_overrides_list $qdt_label
-            set new_entry_label $qdt_label
-        } else {
-            if { $type_name in $qdt_labels_list } {
-                # Treat type_name as qdt datatype to modify
-                #
-                foreach qf $qdt_fields_list {
-                    set d_new_arr(${type_name},${qf}) $d_arr(${qdt_label},${qf})
-                }
-                lappend qdt_overrides_list $type_name
-                set new_entry_label ""
-            }
-        }
-        if { $new_entry_label ne "" } {
+            ##code overrides should only be added if type_name is already in d_arr
+            lappend qdt_overrides_list $template_label
 
             # overlay with tdt values
-            set d_new_arr(${new_entry_label},form_tag_attrs) $form_tag_attrs
-            set d_new_arr(${new_entry_label},empty_allowed_p) $empty_allowed_p
+            set d_new_arr(${type_name},form_tag_attrs) $form_tag_attrs
+            set d_new_arr(${type_name},empty_allowed_p) $empty_allowed_p
             # Delay adding new entries to d_arr
             # until all dependencies reference same originals
             # by keeping changes in d_new_arr 
 
             ns_log Notice "qt_tdt_data_types_to_qdt.1943: changing or adding \
- label '${new_entry_label}'"
+ label '${type_name}' based on '${template_label}'"
 
         } else {
             lappend tdt_ol_retry_lists $tdt_ol
@@ -1961,6 +1956,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
     }
 
     # Apply changes.
+    ns_log Notice "qt_tdt_data_types_to_qdt.1950: changes: [array get d_new_arr]"
     array set d_arr [array get d_new_arr]
     
     # Retry working through tdt_new_arr cases that did not meet dependencies.
@@ -1993,37 +1989,29 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 
                 # type_name is new datatype based on datatype with qdt_label
                 array unset tdt_new_arr
-                set new_entry_label ""
+                set template_label ""
                 if { $qdt_label in $qdt_labels_list } {
-                    # Make a copy of qdt_label into new datatype type_name
-                    foreach qf $qdt_fields_list {
-                        ##code was tdt_new_ol
-                        set d_new_arr(${qdt_label},${qf}) $d_arr(${qdt_label},${qf})
-                    }
-                    lappend qdt_overrides_list $qdt_label
-                    set new_entry_label $qdt_label
-                } else {
-                    if { $type_name in $qdt_labels_list } {
-                        # Treat type_name as qdt datatype to modify
-                        #
-                        foreach qf $qdt_fields_list {
-                            set d_new_arr(${type_name},${qf}) $d_arr(${qdt_label},${qf})
-                        }
-                        lappend qdt_overrides_list $type_name
-                        set new_entry_label ""
-                    }
+                    set template_label $qdt_label
+                } elseif { $type_name in $qdt_labels_list } {
+                    set template_label $type_name
                 }
-                if { $new_entry_label ne "" } {
-                    
+                if { $template_label ne "" } {
+                    # Treat type_name as qdt datatype to modify
+                    #
+                    foreach qf $qdt_fields_list {
+                        set d_new_arr(${type_name},${qf}) $d_arr(${template_label},${qf})
+                    }
+                    lappend qdt_overrides_list $template_label
+
                     # overlay with tdt values
-                    set d_new_arr(${new_entry_label},form_tag_attrs) $form_tag_attrs
-                    set d_new_arr(${new_entry_label},empty_allowed_p) $empty_allowed_p
+                    set d_new_arr(${type_name},form_tag_attrs) $form_tag_attrs
+                    set d_new_arr(${type_name},empty_allowed_p) $empty_allowed_p
                     # Delay adding new entries to d_arr
                     # until all dependencies reference same originals
                     # by keeping changes in d_new_arr 
                     
                     ns_log Notice "qt_tdt_data_types_to_qdt.2024: changing \
- or adding label '${new_entry_label}'"
+ label '${type_name}' based on '${template_label}'"
 
                 } else {
                     lappend new_retry_lists $tdt_ol
@@ -2031,6 +2019,7 @@ ad_proc -public qt_tdt_data_types_to_qdt {
 
             }
             # add new changes
+            ns_log Notice "qt_tdt_data_types_to_qdt.2034: changes: [array get d_new_arr]"
             array set d_arr [array get d_new_arr]
             
             set tdt_ol_retry_lists_len_prev $tdt_ol_retry_lists_len

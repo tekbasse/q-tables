@@ -898,8 +898,10 @@ BEGIN TEST LOOP for value '${v}'"
             set tdt_0len [llength [lindex $tdt_all_lists 0]]
 
             qt_tdt_data_types_to_qdt tdt2_arr t_arr
-            aa_log "test.G1 array get tdt2_arr '[array get tdt2_arr]'"
-            #aa_log "test.G1b array get t_arr '\array get t_arr\'"
+            set tdt2_labels [array names tdt2_arr "*,label"]
+            ns_log Notice "q-tables test.G1 array get tdt2_arr '${tdt2_labels}'"
+            set t_labels [array names tdt2_arr "*,label"]
+            ns_log Notice "q-tables test.G1b array get t_arr '${t_labels}'"
             # Check the cases where t_arr and tdt2_arr have same elements
             # Check cases from tdt_names_list
             
