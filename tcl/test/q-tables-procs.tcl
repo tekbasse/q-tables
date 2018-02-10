@@ -899,17 +899,19 @@ BEGIN TEST LOOP for value '${v}'"
 
             qt_tdt_data_types_to_qdt tdt2_arr t_arr
             aa_log "test.G1 array get tdt2_arr '[array get tdt2_arr]'"
-            aa_log "test.G1b array get t_arr '[array get t_arr]'"
+            #aa_log "test.G1b array get t_arr '\array get t_arr\'"
             # Check the cases where t_arr and tdt2_arr have same elements
             # Check cases from tdt_names_list
+            
             foreach tdt_list $tdt_all_lists {
                 set tdt_len [llength $tdt_list]
                 aa_equals "test.G2 '[lindex $tdt_list 0]'" $tdt_len $tdt_0len
                 lassign $tdt_list type_name qdt_label form_tag_attrs default_field_type empty_allowed_p
                 # Check against tdt2_arr entry
-                foreach n $tdt_names_list {
-                    aa_equals "test.G3 ${type_name} ${n}" $n $td2_arr(${type_name},${n})
-                }
+                aa_equals "test.G4 type_name to label"  $td2_arr(${type_name},label) $label
+                aa_equals "test.G5 form_tag_attrs"  $td2_arr(${type_name},form_tag_attrs) $form_tag_attrs
+                aa_equals "test.G6 empty_allowed_p"  $td2_arr(${type_name},empty_allowed_p) $empty_allowed_p
+
             }
 
             ns_log Notice "tcl/test/q-control-procs.tcl.429 test end"
