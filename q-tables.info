@@ -13,8 +13,12 @@
         <owner url="mailto:tekbasse@yahoo.com">Benjamin Brink</owner>
         <owner url="http://openacs.org">OpenACS Community</owner>
         <summary>Provides utility resources for importing and integrating data.</summary>
+        <release-date>2018-02-15</release-date>
         <description format="text/plain">Provides procs and a UI for importing, editing and exporting data in table formats. Provides a way to extend application forms that use Q-Forms&#39; auto form generation API.</description>
-        <maturity>0</maturity>
+        <install package="q-data-types"/>
+        <license>Gnu GPL v2</license>
+        <license_url>https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html#SEC1</license_url>
+        <maturity>1</maturity>
 
         <provides url="q-tables" version="0.1d"/>
         <requires url="q-data-types" version="0.011"/>
@@ -22,7 +26,7 @@
         <callbacks>
         </callbacks>
         <parameters>
-        <!-- No version parameters -->
+            <parameter scope="instance" datatype="string"  min_n_values="1"  max_n_values="1"  name="AllowedValidationProcs"  description="A space separated list of validation procs not pre-existing in table qdt_data_types.valida_proc. Screening uses STRING MATCH, so globs are okay. For example, &#39;qt_validate_*&#39; accepts any proc beginning with &#39;qt_validate_&#39;" section_name="security"/>
         </parameters>
 
     </version>

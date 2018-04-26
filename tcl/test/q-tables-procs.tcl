@@ -918,10 +918,7 @@ BEGIN TEST LOOP for value '${v}'"
             }
 
             ns_log Notice "tcl/test/q-control-procs.tcl.429 test end"
-        } \
-        -teardown_code {
-
-        }
+        } 
     #aa_true "Test for .." $passed_p
     #aa_equals "Test for .." $test_value $expected_value
 
